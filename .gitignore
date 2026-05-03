@@ -1,0 +1,11 @@
+.ipynb_checkpoints/
+wenv/
+# Large data files
+*.csv
+*.xlsx
+*.xls
+*.parquet
+*.h5
+*.hdf5
+
+Backend/app/__pycache__/

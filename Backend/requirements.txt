@@ -1,0 +1,12 @@
+# backend/requirements.txt
+fastapi==0.111.0
+uvicorn[standard]==0.29.0
+pydantic==2.7.1
+pydantic-settings==2.2.1
+xgboost==2.0.3
+scikit-learn==1.4.2
+joblib==1.4.2
+pandas==2.2.2
+numpy==1.26.4
+imbalanced-learn==0.12.3
+python-dotenv==1.0.1
