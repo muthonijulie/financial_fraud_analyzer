@@ -1,0 +1,58 @@
+# docker-compose.yml  (sits at the project root)
+services:
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: sfba_backend
+    ports:
+      - "8000:8000"
+    volumes:
+      # Mount artifacts from host — update models without rebuilding
+      - ./backend/artifacts:/app/artifacts:ro
+    environment:
+      - MODEL_PATH=/app/artifacts/fraud_model.pkl
+      - SCALER_PATH=/app/artifacts/scaler.pkl
+      - CONFIG_PATH=/app/artifacts/model_config.json
+    healthcheck:
+      test: ["CMD","curl","-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - sfba_net
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        # Nginx proxies /api → backend, so the browser hits the same origin
+        - NEXT_PUBLIC_API_URL=/
+    container_name: sfba_frontend
+    depends_on:
+      backend:
+        condition: service_healthy   # waits for backend to be ready
+    restart: unless-stopped
+    networks:
+      - sfba_net
+
+  nginx:
+    image: nginx:alpine
+    container_name: sfba_nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - backend
+      - frontend
+    restart: unless-stopped
+    networks:
+      - sfba_net
+
+networks:
+  sfba_net:
+    driver: bridge

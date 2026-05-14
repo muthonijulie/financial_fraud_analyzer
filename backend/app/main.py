@@ -5,6 +5,7 @@ from app.core.config import settings
 from app.api.routes import detect
 from app.ml.model import fraud_model
 import logging
+from app.api.routes import detect,insights
 
 logging.basicConfig(
     level=logging.INFO,
@@ -30,6 +31,7 @@ app.add_middleware(
     allow_headers=["*"]
 )
 app.include_router(detect.router,prefix="/api/v1")
+app.include_router(insights.router,prefix="/api/v1")
 
 @app.get("/health",tags=["Health"])
 async def health():
